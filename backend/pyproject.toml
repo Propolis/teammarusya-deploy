@@ -9,17 +9,16 @@ dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
 
-    # Parsing and HTTP (reused from code/sentimen_analiz + parser)
+    # Parsing and HTTP
     "requests>=2.31.0",
     "beautifulsoup4>=4.12.0",
     "lxml>=4.9.0",
     "newspaper3k>=0.2.8",
 
-    # ML stack — опираемся на те же версии, что и в code/sentimen_analiz
-    "transformers[torch]>=4.30.0",
+    # ML stack — CPU-only for smaller image
+    "transformers>=4.30.0",
     "torch>=2.4.0",
-    "torchvision>=0.19.0",
-    "torchaudio>=2.4.0",
+    # Removed torchvision and torchaudio - not needed for text analysis
     "tokenizers>=0.13.0",
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -38,6 +37,7 @@ dependencies = [
     "pydantic>=2.7.0",
     "python-dotenv>=1.0.0",
 ]
+
 
 [build-system]
 requires = ["setuptools>=61.0"]

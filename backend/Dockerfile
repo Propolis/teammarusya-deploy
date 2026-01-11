@@ -16,7 +16,10 @@ RUN pip install --no-cache-dir uv
 # Copy dependency files first for layer caching
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies
+# Install CPU-only PyTorch first (saves ~5GB vs CUDA version)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install dependencies (will skip torch since already installed)
 RUN uv sync --frozen --no-dev
 
 # Copy source code
