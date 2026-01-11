@@ -2,11 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# System dependencies for lxml, pymorphy3
+# System dependencies for lxml, pymorphy3, curl
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libxml2-dev \
     libxslt1-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv package manager
@@ -21,11 +22,12 @@ RUN uv sync --frozen --no-dev
 # Copy source code
 COPY src/ ./src/
 
-# Copy ML modules (without heavy model files yet)
+# Copy ML modules (without heavy model files)
 COPY code/ ./code/
 
-# Copy ML models (tracked via Git LFS)
-COPY models/ ./models/
+# Copy model download script
+COPY download_models.sh ./download_models.sh
+RUN chmod +x ./download_models.sh
 
 # Environment variables for model paths
 ENV CLICKBAIT_MODEL_PATH=/app/models/clickbait
@@ -35,4 +37,5 @@ ENV CLICKBAIT_MODULE_PATH=/app/code/klikbait/predict.py
 
 EXPOSE 8000
 
-CMD ["uv", "run", "python", "-m", "src.api.main"]
+# Download models and start server
+CMD ["sh", "-c", "./download_models.sh && uv run python -m src.api.main"]
