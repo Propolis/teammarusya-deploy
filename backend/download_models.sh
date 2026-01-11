@@ -2,38 +2,35 @@
 # Download ML models at container startup
 set -e
 
-echo "Downloading ML models..."
+echo "Setting up ML models..."
 
 # Create models directory
-mkdir -p /app/models/clickbait
+mkdir -p /app/models/clickbait/checkpoint-113
 
-# Download water quality model (315MB)
-if [ ! -f "/app/models/ruber_quality_model.pkl" ]; then
-    echo "Downloading ruber_quality_model.pkl..."
-    curl -L -o /app/models/ruber_quality_model.pkl \
-        "https://github.com/Propolis/teammarusya-deploy/releases/download/models-v1/ruber_quality_model.pkl" || \
-        echo "Warning: Could not download ruber_quality_model.pkl"
+# For production: download from HuggingFace or GitHub Release
+# For now: use models from code/ directory if available (during transition)
+
+# Copy water quality models if they exist in code/
+if [ -f "/app/code/water/ruber_quality_model.pkl" ]; then
+    echo "Using ruber_quality_model.pkl from code directory"
+    cp /app/code/water/ruber_quality_model.pkl /app/models/
+else
+    echo "Warning: ruber_quality_model.pkl not found"
 fi
 
-# Download logreg water model (small)
-if [ ! -f "/app/models/logreg_water_model.pkl" ]; then
-    echo "Downloading logreg_water_model.pkl..."
-    curl -L -o /app/models/logreg_water_model.pkl \
-        "https://github.com/Propolis/teammarusya-deploy/releases/download/models-v1/logreg_water_model.pkl" || \
-        echo "Warning: Could not download logreg_water_model.pkl"
+if [ -f "/app/code/water/logreg_water_model.pkl" ]; then
+    echo "Using logreg_water_model.pkl from code directory"
+    cp /app/code/water/logreg_water_model.pkl /app/models/
+else
+    echo "Warning: logreg_water_model.pkl not found"
 fi
 
-# Download clickbait model from HuggingFace or GitHub Release
-if [ ! -d "/app/models/clickbait/checkpoint-113" ]; then
-    echo "Downloading clickbait model..."
-    mkdir -p /app/models/clickbait/checkpoint-113
-    
-    # Download model files
-    for file in config.json model.safetensors special_tokens_map.json tokenizer.json tokenizer_config.json vocab.txt; do
-        curl -L -o "/app/models/clickbait/checkpoint-113/$file" \
-            "https://github.com/Propolis/teammarusya-deploy/releases/download/models-v1/$file" || \
-            echo "Warning: Could not download $file"
-    done
+# Copy clickbait model if it exists
+if [ -d "/app/code/klikbait/my_awesome_model/checkpoint-113" ]; then
+    echo "Using clickbait model from code directory"
+    cp -r /app/code/klikbait/my_awesome_model/checkpoint-113/* /app/models/clickbait/checkpoint-113/
+else
+    echo "Warning: clickbait model not found"
 fi
 
-echo "Models downloaded successfully!"
+echo "Model setup complete!"

@@ -23,3 +23,7 @@ Thumbs.db
 # IDE
 .idea/
 .vscode/
+
+# ML models - kept in code/ but not tracked by LFS
+backend/code/water/*.pkl
+backend/code/klikbait/my_awesome_model/
